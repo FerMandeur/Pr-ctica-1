@@ -1,0 +1,182 @@
+clc;
+clear;
+close all;
+
+%% =========================================================
+%   ANÁLISIS DE IMÁGENES
+%   E. coli - Enterococcus - Control
+%   Control = 100 %
+% ==========================================================
+
+%% 1. CARGAR IMAGEN DE E. COLI
+
+[archivo_ecoli, ruta_ecoli] = uigetfile( ...
+    {'*.jpg;*.jpeg;*.png;*.bmp', ...
+    'Imágenes (*.jpg, *.jpeg, *.png, *.bmp)'}, ...
+    'Selecciona la imagen de Escherichia coli');
+
+if isequal(archivo_ecoli,0)
+    disp('No se seleccionó E. coli');
+    return;
+end
+
+I_ecoli = imread(fullfile(ruta_ecoli, archivo_ecoli));
+
+
+%% 2. CARGAR IMAGEN DE ENTEROCOCCUS
+
+[archivo_enterococcus, ruta_enterococcus] = uigetfile( ...
+    {'*.jpg;*.jpeg;*.png;*.bmp', ...
+    'Imágenes (*.jpg, *.jpeg, *.png, *.bmp)'}, ...
+    'Selecciona la imagen de Enterococcus');
+
+if isequal(archivo_enterococcus,0)
+    disp('No se seleccionó Enterococcus');
+    return;
+end
+
+I_enterococcus = imread( ...
+    fullfile(ruta_enterococcus, archivo_enterococcus));
+
+
+%% 3. CARGAR IMAGEN DEL CONTROL
+
+[archivo_control, ruta_control] = uigetfile( ...
+    {'*.jpg;*.jpeg;*.png;*.bmp', ...
+    'Imágenes (*.jpg, *.jpeg, *.png, *.bmp)'}, ...
+    'Selecciona la imagen del Control');
+
+if isequal(archivo_control,0)
+    disp('No se seleccionó el Control');
+    return;
+end
+
+I_control = imread( ...
+    fullfile(ruta_control, archivo_control));
+
+
+%% =========================================================
+% 4. CONVERTIR LAS IMÁGENES A ESCALA DE GRISES
+% ==========================================================
+
+gris_ecoli = rgb2gray(I_ecoli);
+gris_enterococcus = rgb2gray(I_enterococcus);
+gris_control = rgb2gray(I_control);
+
+
+%% =========================================================
+% 5. CALCULAR INTENSIDAD PROMEDIO
+% ==========================================================
+
+valor_ecoli = mean(gris_ecoli(:));
+
+valor_enterococcus = mean(gris_enterococcus(:));
+
+valor_control = mean(gris_control(:));
+
+
+%% =========================================================
+% 6. ESTABLECER EL CONTROL COMO 100 %
+% ==========================================================
+
+relativo_ecoli = ...
+    (valor_ecoli / valor_control) * 100;
+
+relativo_enterococcus = ...
+    (valor_enterococcus / valor_control) * 100;
+
+relativo_control = 100;
+
+
+%% =========================================================
+% 7. MOSTRAR IMÁGENES
+% ==========================================================
+
+figure('Name','Imágenes analizadas');
+
+subplot(1,3,1);
+imshow(I_ecoli);
+title('E. coli');
+
+subplot(1,3,2);
+imshow(I_enterococcus);
+title('Enterococcus');
+
+subplot(1,3,3);
+imshow(I_control);
+title('Control');
+
+
+%% =========================================================
+% 8. MOSTRAR IMÁGENES EN ESCALA DE GRISES
+% ==========================================================
+
+figure('Name','Escala de grises');
+
+subplot(1,3,1);
+imshow(gris_ecoli);
+title('E. coli');
+
+subplot(1,3,2);
+imshow(gris_enterococcus);
+title('Enterococcus');
+
+subplot(1,3,3);
+imshow(gris_control);
+title('Control');
+
+
+%% =========================================================
+% 9. GRÁFICA COMPARATIVA
+% ==========================================================
+
+resultados = [ ...
+    relativo_ecoli ...
+    relativo_enterococcus ...
+    relativo_control];
+
+figure('Name','Comparación respecto al control');
+
+bar(resultados);
+
+set(gca,'XTickLabel', ...
+    {'E. coli','Enterococcus','Control'});
+
+ylabel('Intensidad relativa (%)');
+
+xlabel('Muestra');
+
+title('Comparación respecto al control');
+
+grid on;
+
+
+%% =========================================================
+% 10. MOSTRAR RESULTADOS
+% ==========================================================
+
+fprintf('\n');
+fprintf('=============================================\n');
+fprintf('       RESULTADOS DEL ANÁLISIS\n');
+fprintf('=============================================\n');
+
+fprintf('Intensidad E. coli:       %.2f\n', ...
+    valor_ecoli);
+
+fprintf('Intensidad Enterococcus:  %.2f\n', ...
+    valor_enterococcus);
+
+fprintf('Intensidad Control:       %.2f\n', ...
+    valor_control);
+
+fprintf('\n');
+
+fprintf('E. coli respecto al control:       %.2f %%\n', ...
+    relativo_ecoli);
+
+fprintf('Enterococcus respecto al control:  %.2f %%\n', ...
+    relativo_enterococcus);
+
+fprintf('Control:                            100.00 %%\n');
+
+fprintf('=============================================\n');
